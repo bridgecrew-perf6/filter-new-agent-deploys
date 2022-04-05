@@ -4,3 +4,4 @@ forta.config.json
 
 .env
 .forta.config.json
+.DS_Store
