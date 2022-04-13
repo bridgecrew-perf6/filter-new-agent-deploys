@@ -13,19 +13,26 @@ const handleTransaction = txEvent => {
   const findings = []
   
   // filter agent for forta deployer's createAgent function triggers
-  const fortaAccountDeploymentInvocations = txEvent.filterFunction(FORTA_CREATE_AGENT_FUNCTION, FORTA_CONTRACT)
-  // console.log(`forta invocation array: ${fortaAccountDeploymentInvocations}`)
-  // console.log(...fortaAccountDeploymentInvocations)
+  const deployments = txEvent.filterFunction(FORTA_CREATE_AGENT_FUNCTION, FORTA_CONTRACT)
+  // console.log(`forta invocation array: ${deployments}`)
+  // console.log(...deployments)
 
   const { from, to } = txEvent.transaction
-
-  console.log(`from: ${from}`)
 
   // limiting this agent to emit only 5 findings so that the alert feed is not spammed
   if(findingsCount >= 5)  return findings
   
-  fortaAccountDeploymentInvocations.forEach(deployment => {
-    console.log(`deployment args: ${deployment.args}`)
+  deployments.forEach(deployment => {
+    const { args } = deployment
+
+    const [agent, deployer, ipfs] = args
+    console.log(`agent: ${agent}`)
+    console.log(`deployer: ${deployer}`)
+    console.log(`ipfs: ${ipfs}`)
+
+   
+    let formattedAgent = BigInt(agent).toString()
+    console.log(`agent: ${formattedAgent}`)
     
     if(from.toLowerCase() === FORTA_DEPLOYER_ADDRESS.toLowerCase()) {
        findings.push(
@@ -37,7 +44,8 @@ const handleTransaction = txEvent => {
           type: FindingType.Info, 
           metadata: {
             from,
-            to
+            to, 
+            agent: formattedAgent
           }
         })
       )
@@ -49,5 +57,8 @@ const handleTransaction = txEvent => {
 }
 
 module.exports = {
-  handleTransaction
+  handleTransaction,
+  FORTA_CREATE_AGENT_FUNCTION,
+  FORTA_CONTRACT,
+  FORTA_DEPLOYER_ADDRESS
 }

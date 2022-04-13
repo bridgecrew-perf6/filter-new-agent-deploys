@@ -6,7 +6,11 @@ const {
   ethers
 } = require("forta-agent")
 
-const { handleTransaction } = require("./agent");
+const { 
+  handleTransaction,
+  FORTA_CREATE_AGENT_FUNCTION,
+  FORTA_CONTRACT
+} = require("./agent");
 
 console.log(`handle tx: ${handleTransaction}`)
 
@@ -21,11 +25,10 @@ describe("New Agent Deployment",  async () => {
 
     it('returns empty findings if there are no new deployment', async () => {
       mockNewAgentDeployFunction.filterFunction.mockReturnValue([]);
-      
       const findings = await handleTransaction(mockDeployment)
-      console.log(`finding: ${findings}`)
       expect(findings).toStrictEqual([])
       expect(mockDeployment.filterFunction).toHaveBeenCalled(1)
+      expect(mockDeployment.filterFunction).toHaveBeenCalledWith(FORTA_CREATE_AGENT_FUNCTION, FORTA_CONTRACT)
     })
   })
 });
